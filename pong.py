@@ -68,7 +68,7 @@ def draw(win, paddles, ball, left_score, right_score):
 
 
 class Ball:
-    MAX_VEL = 5
+    MAX_VEL = 7
     COLOR = WHITE
     def __init__(self, x,y, radius):
         self.x = self.original_x = x
@@ -124,17 +124,21 @@ def handle_collision(ball, left_paddle, right_paddle):
                 ball.y_vel = -1* y_vel
        
 
-def handle_paddle_movement(keys, left_paddle, right_paddle):
-    # Left Player key presses
-    if keys[pygame.K_w]  and left_paddle.y - left_paddle.VEL >= 0:
-        left_paddle.move(up = True)
-    if keys[pygame.K_s] and left_paddle.y + left_paddle.VEL + left_paddle.height <= HEIGHT:
-        left_paddle.move(up=False)
+def handle_player_movement(keys, paddle):
     # Right player key Presses
-    if keys[pygame.K_UP]  and right_paddle.y - right_paddle.VEL >= 0:
-        right_paddle.move(up = True)
-    if keys[pygame.K_DOWN] and right_paddle.y + right_paddle.VEL + right_paddle.height <= HEIGHT:
-        right_paddle.move(up=False)
+    if keys[pygame.K_UP]  and paddle.y - paddle.VEL >= 0:
+        paddle.move(up = True)
+    if keys[pygame.K_DOWN] and paddle.y + paddle.VEL + paddle.height <= HEIGHT:
+        paddle.move(up=False)
+
+# Define the movement for the hardcoded bot
+def handle_bot_movement(paddle, ball):
+    print(f"Ball: {ball.y}, Paddle: {paddle.y}")
+    if ball.y <= paddle.y and paddle.y - paddle.VEL >= 0:
+        paddle.move(up = True)
+    elif ball.y > paddle.y and paddle.y + paddle.VEL + paddle.height < HEIGHT:
+        paddle.move(up = False)
+
 
 def main():
     run = True
@@ -168,8 +172,10 @@ def main():
         
         # Get key presses and pass to paddle movement
         keys = pygame.key.get_pressed()
-        handle_paddle_movement(keys, left_paddle, right_paddle)
+        handle_player_movement(keys, right_paddle)
         
+        handle_bot_movement(left_paddle, ball)
+
         #Move the Ball and check to see if there is collision
         ball.move()
         handle_collision(ball, left_paddle, right_paddle)
